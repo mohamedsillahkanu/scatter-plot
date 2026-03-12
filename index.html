@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scatter Plot | ICF-SL</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{padding:20px;background:#fff;font-family:'Oswald',Arial,sans-serif;color:#000;font-weight:500;}
+.page-container{width:100%;max-width:1200px;margin:0 auto;}
+.page-header{background:#004080;color:#fff;padding:25px 30px;text-align:center;margin-bottom:15px;border-radius:8px 8px 0 0;}
+.logo-row{display:flex;justify-content:center;gap:30px;margin-bottom:15px;}
+.logo-box{background:#fff;border-radius:8px;padding:10px;}
+.logo-box img{width:100px;height:auto;border-radius:6px;}
+.page-header h3{margin:12px 0 5px;font-size:14px;font-weight:700;letter-spacing:1px;}
+.page-header .tagline{margin:0;font-size:10px;}
+.page-header h1{margin:20px 0 10px;font-size:24px;font-weight:700;letter-spacing:1px;}
+.page-header .subtitle{font-size:14px;}
+.content-card{border:4px double #004080;border-radius:12px;padding:12px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);margin-bottom:15px;}
+.content-inner{padding:25px;}
+.section-header{background:#004080;color:#fff;padding:15px 20px;margin-bottom:20px;border-radius:6px;display:flex;align-items:center;gap:15px;}
+.section-icon{background:#fff;color:#004080;width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;}
+.section-title{font-size:18px;font-weight:700;letter-spacing:0.5px;}
+.upload-section{background:#f8f9fa;padding:2rem;border-radius:8px;border:2px dashed #004080;text-align:center;margin:1rem 0;}
+.upload-section.loaded{background:#d4edda;border-color:#28a745;border-style:solid;}
+.upload-section h3{color:#004080;margin-bottom:1rem;font-size:18px;}
+.file-input-wrapper{position:relative;display:inline-block;cursor:pointer;background:#004080;color:#fff;padding:14px 24px;border-radius:6px;border:2px solid #004080;font-size:14px;font-weight:700;text-transform:uppercase;font-family:'Oswald',Arial,sans-serif;margin-top:1rem;}
+.file-input-wrapper input[type="file"]{position:absolute;left:-9999px;}
+.file-status{margin-top:15px;font-weight:700;}
+.file-status.loaded{color:#28a745;}
+.btn{padding:14px 24px;border:2px solid #004080;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;text-transform:uppercase;font-family:'Oswald',Arial,sans-serif;transition:all 0.2s;margin:5px;}
+.btn-primary{background:#004080;color:#fff;}
+.btn-primary:hover{background:#0056b3;}
+.btn-gold{background:#ffc107;color:#000;border-color:#ffc107;}
+.btn-sm{padding:8px 16px;font-size:12px;}
+.config-card{background:#f8f9fa;padding:1.5rem;border-radius:8px;border:2px solid #004080;margin:1rem 0;}
+.config-card h4{color:#004080;margin-bottom:1rem;font-size:16px;font-weight:700;}
+.form-select,.form-input{width:100%;padding:12px;border:2px solid #004080;border-radius:6px;font-family:'Oswald',sans-serif;font-size:14px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;margin-bottom:1rem;}
+.form-group{margin-bottom:1rem;}
+.form-label{display:block;color:#004080;font-size:12px;font-weight:700;margin-bottom:8px;text-transform:uppercase;}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin:1.5rem 0;}
+.feature-card{background:#f8f9fa;padding:1.5rem;border-radius:8px;border:2px solid #004080;}
+.feature-card h4{color:#004080;margin-bottom:1rem;font-size:16px;font-weight:700;text-transform:uppercase;}
+.feature-card ul{color:#000;line-height:1.8;padding-left:1.5rem;}
+.feature-card li{margin-bottom:0.5rem;font-weight:500;font-size:14px;}
+.feature-card p{font-size:14px;line-height:1.7;}
+.alert{padding:1rem;border-radius:6px;margin:1rem 0;font-weight:500;}
+.alert-success{background:#d4edda;border:2px solid #28a745;color:#155724;}
+.alert-warning{background:#fff3cd;border:2px solid #ffc107;color:#856404;}
+.alert-info{background:#e7f3ff;border:2px solid #004080;color:#004080;}
+.hidden{display:none!important;}
+.result-box{background:#f8f9fa;border:2px solid #004080;border-radius:8px;padding:20px;margin:15px 0;}
+.result-title{color:#004080;font-size:18px;font-weight:700;margin-bottom:15px;border-bottom:2px solid #004080;padding-bottom:10px;}
+.chart-container{border:2px solid #004080;border-radius:8px;margin-top:15px;background:#fff;min-height:500px;}
+.corr-box{background:#e7f3ff;border:2px solid #004080;border-radius:8px;padding:15px;margin:10px 0;}
+.page-footer{background:#004080;color:#fff;padding:20px 30px;text-align:center;font-size:13px;line-height:1.7;border-radius:0 0 8px 8px;}
+.page-footer p{margin:6px 0 0;font-size:12px;}
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="page-header">
+    <div class="logo-row"><div class="logo-box"><img src="https://github.com/mohamedsillahkanu/gdp-dashboard-2/raw/6c7463b0d5c3be150aafae695a4bcbbd8aeb1499/ICF-SL.jpg" alt="ICF-SL Logo"></div></div>
+    <h3>Informatics Consultancy Firm-Sierra Leone<br>(ICF-SL)</h3>
+    <p class="tagline"><em>Driving Data-Driven Solutions for Health and Development</em></p>
+    <h1>SCATTER PLOT</h1>
+    <p class="subtitle">Relationship Between Two Continuous Variables with Correlation</p>
+  </div>
+  <div class="content-card"><div class="content-inner">
+    <div id="alertContainer"></div>
+    <div class="section-header"><span class="section-icon">?</span><span class="section-title">ABOUT THIS TOOL</span></div>
+    <div class="feature-grid">
+      <div class="feature-card"><h4>What is a Scatter Plot?</h4><p>A scatter plot displays the relationship between two continuous variables by plotting individual data points. Patterns in the scatter indicate correlation direction and strength. A trend line can be overlaid to summarise the relationship.</p></div>
+      <div class="feature-card"><h4>Features</h4><ul><li>Optional linear regression trend line</li><li>Color coding by categorical group</li><li>Bubble size as a third variable</li><li>Pearson correlation coefficient (r)</li><li>Marginal histograms available</li></ul></div>
+      <div class="feature-card"><h4>Correlation Interpretation</h4><ul><li><strong>r = 1.0:</strong> Perfect positive correlation</li><li><strong>r = 0.7+:</strong> Strong positive</li><li><strong>r = 0.4-0.7:</strong> Moderate positive</li><li><strong>r = 0 to 0.4:</strong> Weak / no correlation</li><li><strong>Negative r:</strong> Inverse relationship</li></ul></div>
+    </div>
+    <div class="section-header"><span class="section-icon">1</span><span class="section-title">DATA INPUT</span></div>
+    <div class="config-card"><h4>Upload Your Data File</h4><button class="btn btn-gold" onclick="downloadSample()">📥 Download Sample Data</button></div>
+    <div class="upload-section" id="uploadZone">
+      <h3>📁 UPLOAD DATA FILE</h3><p>Supports CSV and Excel (.xlsx, .xls) files</p>
+      <label class="file-input-wrapper">Choose File<input type="file" id="fileInput" accept=".csv,.xlsx,.xls"></label>
+      <div id="fileStatus" class="file-status"></div>
+    </div>
+    <div id="configSection" class="config-card hidden">
+      <h4>Configure Scatter Plot</h4>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">X-Axis (Numeric)</label><select id="xVar" class="form-select"><option value="">-- Select --</option></select></div>
+        <div class="form-group"><label class="form-label">Y-Axis (Numeric)</label><select id="yVar" class="form-select"><option value="">-- Select --</option></select></div>
+        <div class="form-group"><label class="form-label">Color / Group By</label><select id="colorVar" class="form-select"><option value="">-- None --</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Bubble Size Variable</label><select id="sizeVar" class="form-select"><option value="">-- None --</option></select></div>
+        <div class="form-group"><label class="form-label">Trend Line</label><select id="trendline" class="form-select"><option value="none">No Trend Line</option><option value="ols">Linear (OLS)</option><option value="lowess">LOWESS Smooth</option></select></div>
+        <div class="form-group"><label class="form-label">Chart Title</label><input type="text" id="chartTitle" class="form-input" placeholder="X vs Y"></div>
+      </div>
+      <button class="btn btn-primary" onclick="renderChart()">📊 Generate Scatter Plot</button>
+    </div>
+    <div id="resultsSection" class="hidden">
+      <div class="section-header"><span class="section-icon">2</span><span class="section-title">RESULTS</span></div>
+      <div id="corrBox" class="corr-box"></div>
+      <div class="result-box">
+        <div class="result-title">📊 Scatter Plot</div>
+        <div class="chart-container" id="chartArea"></div>
+        <div style="margin-top:15px;">
+          <button class="btn btn-gold btn-sm" onclick="Plotly.downloadImage('chartArea',{format:'png',width:1200,height:700,filename:'scatter_plot'})">📥 PNG</button>
+          <button class="btn btn-gold btn-sm" onclick="Plotly.downloadImage('chartArea',{format:'svg',filename:'scatter_plot'})">📥 SVG</button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <div class="page-footer">Informatics Consultancy Firm-Sierra Leone (ICF-SL)<p><em>Driving Data-Driven Solutions for Health and Development</em></p></div>
+</div>
+<script>
+let uploadedData=[], uploadedColumns=[];
+const COLORS=['#004080','#dc3545','#28a745','#ffc107','#17a2b8','#6f42c1','#fd7e14','#20c997'];
+
+function showAlert(msg,type){const c=document.getElementById('alertContainer');c.innerHTML=`<div class="alert alert-${type}">${msg}</div>`;setTimeout(()=>c.innerHTML='',5000);}
+
+document.getElementById('fileInput').addEventListener('change',function(e){
+  const file=e.target.files[0]; if(!file)return;
+  const statusEl=document.getElementById('fileStatus');
+  statusEl.textContent='Loading...'; statusEl.className='file-status';
+  const reader=new FileReader();
+  const isCSV=file.name.toLowerCase().endsWith('.csv');
+  reader.onload=function(ev){
+    try{
+      if(isCSV){const r=Papa.parse(ev.target.result,{header:true,skipEmptyLines:true,dynamicTyping:true});uploadedData=r.data;uploadedColumns=r.meta.fields||[];}
+      else{const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];uploadedData=XLSX.utils.sheet_to_json(ws);uploadedColumns=Object.keys(uploadedData[0]||{});}
+      statusEl.innerHTML=`✓ Loaded: ${file.name} (${uploadedData.length} rows)`;
+      statusEl.className='file-status loaded';
+      document.getElementById('uploadZone').classList.add('loaded');
+      ['xVar','yVar','colorVar','sizeVar'].forEach(id=>{
+        const sel=document.getElementById(id);
+        sel.innerHTML=['colorVar','sizeVar'].includes(id)?'<option value="">-- None --</option>':'<option value="">-- Select --</option>';
+        uploadedColumns.forEach(col=>sel.innerHTML+=`<option value="${col}">${col}</option>`);
+      });
+      document.getElementById('configSection').classList.remove('hidden');
+      showAlert('File loaded!','success');
+    }catch(err){statusEl.innerHTML='✗ Error';statusEl.className='file-status error';showAlert('Error: '+err.message,'error');}
+  };
+  if(isCSV)reader.readAsText(file); else reader.readAsArrayBuffer(file);
+});
+
+function pearsonR(x,y){
+  const n=x.length; if(n<2)return 0;
+  const mx=x.reduce((a,b)=>a+b,0)/n, my=y.reduce((a,b)=>a+b,0)/n;
+  const num=x.reduce((s,xi,i)=>s+(xi-mx)*(y[i]-my),0);
+  const dx=Math.sqrt(x.reduce((s,xi)=>s+Math.pow(xi-mx,2),0));
+  const dy=Math.sqrt(y.reduce((s,yi)=>s+Math.pow(yi-my,2),0));
+  return dx&&dy?num/(dx*dy):0;
+}
+
+function olsLine(xv,yv){
+  const n=xv.length, mx=xv.reduce((a,b)=>a+b,0)/n, my=yv.reduce((a,b)=>a+b,0)/n;
+  const num=xv.reduce((s,x,i)=>s+(x-mx)*(yv[i]-my),0);
+  const den=xv.reduce((s,x)=>s+Math.pow(x-mx,2),0);
+  const b=num/den, a=my-b*mx;
+  const xs=[Math.min(...xv),Math.max(...xv)];
+  return{xs,ys:xs.map(x=>a+b*x),b:b.toFixed(3),a:a.toFixed(3)};
+}
+
+function renderChart(){
+  const xVar=document.getElementById('xVar').value;
+  const yVar=document.getElementById('yVar').value;
+  const colorVar=document.getElementById('colorVar').value;
+  const sizeVar=document.getElementById('sizeVar').value;
+  const trendline=document.getElementById('trendline').value;
+  const title=document.getElementById('chartTitle').value||`${xVar} vs ${yVar}`;
+  if(!xVar||!yVar){showAlert('Select X and Y variables.','warning');return;}
+
+  const traces=[];
+  const allX=uploadedData.map(r=>parseFloat(r[xVar])).filter((v,i)=>!isNaN(v)&&!isNaN(parseFloat(uploadedData[i][yVar])));
+  const allY=uploadedData.filter(r=>!isNaN(parseFloat(r[xVar]))&&!isNaN(parseFloat(r[yVar]))).map(r=>parseFloat(r[yVar]));
+  const r=pearsonR(allX,allY);
+
+  if(colorVar&&colorVar!==''){
+    const groups=[...new Set(uploadedData.map(r=>String(r[colorVar]??'').trim()).filter(Boolean))].sort();
+    groups.forEach((g,gi)=>{
+      const subset=uploadedData.filter(row=>String(row[colorVar]??'').trim()===g);
+      const xs=subset.map(row=>parseFloat(row[xVar])).filter(v=>!isNaN(v));
+      const ys=subset.filter(row=>!isNaN(parseFloat(row[xVar]))).map(row=>parseFloat(row[yVar])).filter(v=>!isNaN(v));
+      const sizes=sizeVar?subset.map(row=>Math.max(5,parseFloat(row[sizeVar])||5)):undefined;
+      traces.push({x:xs,y:ys,mode:'markers',name:g,type:'scatter',marker:{color:COLORS[gi%COLORS.length],size:sizes||8,opacity:0.7}});
+    });
+  } else {
+    const valid=uploadedData.filter(r=>!isNaN(parseFloat(r[xVar]))&&!isNaN(parseFloat(r[yVar])));
+    const xs=valid.map(r=>parseFloat(r[xVar])), ys=valid.map(r=>parseFloat(r[yVar]));
+    const sizes=sizeVar?valid.map(r=>Math.max(5,parseFloat(r[sizeVar])||5)):undefined;
+    traces.push({x:xs,y:ys,mode:'markers',name:`${xVar} vs ${yVar}`,type:'scatter',marker:{color:'#004080',size:sizes||8,opacity:0.7}});
+  }
+
+  if(trendline==='ols'){
+    const valid=uploadedData.filter(r=>!isNaN(parseFloat(r[xVar]))&&!isNaN(parseFloat(r[yVar])));
+    const xs=valid.map(r=>parseFloat(r[xVar])), ys=valid.map(r=>parseFloat(r[yVar]));
+    const l=olsLine(xs,ys);
+    traces.push({x:l.xs,y:l.ys,mode:'lines',name:`OLS: y=${l.b}x+${l.a}`,line:{color:'#dc3545',width:2,dash:'dash'},showlegend:true});
+  }
+
+  const r2=(r*r).toFixed(3);
+  const rStr=r.toFixed(3);
+  document.getElementById('corrBox').innerHTML=`<strong style="color:#004080;">Pearson Correlation:</strong> r = ${rStr} (r² = ${r2}) | N = ${allX.length} | Strength: <em>${Math.abs(r)<0.2?'Negligible':Math.abs(r)<0.4?'Weak':Math.abs(r)<0.6?'Moderate':Math.abs(r)<0.8?'Strong':'Very Strong'} ${r<0?'negative':'positive'} correlation</em>`;
+
+  Plotly.newPlot('chartArea',traces,{
+    title:{text:`<b>${title}</b>`,font:{family:'Oswald',size:20,color:'#004080'}},
+    xaxis:{title:{text:xVar,font:{size:14}},tickfont:{size:12}},
+    yaxis:{title:{text:yVar,font:{size:14}}},
+    legend:{orientation:'h',y:-0.2},font:{family:'Oswald'},
+    plot_bgcolor:'#fff',paper_bgcolor:'#fff',margin:{t:70,b:100,l:70,r:30}
+  },{responsive:true});
+  document.getElementById('resultsSection').classList.remove('hidden');
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'});
+  showAlert('Scatter plot rendered!','success');
+}
+
+function downloadSample(){
+  const regions=['Western Area','Northern','Eastern','Southern'];
+  const results=['Positive','Negative'];
+  const rows=[['Age','Hemoglobin','Weight_kg','Temp_C','Cases','Region','RDT_Result']];
+  for(let i=0;i<250;i++){
+    const age=Math.round(1+Math.random()*70);
+    rows.push([age,(8+Math.random()*6-age/100).toFixed(1),(10+age*0.8+Math.random()*10).toFixed(1),(36+Math.random()*3).toFixed(1),Math.floor(Math.random()*200)+1,regions[Math.floor(Math.random()*4)],results[Math.floor(Math.random()*2)]]);
+  }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'})); a.download='scatter_plot_sample.csv'; a.click();
+  showAlert('Sample downloaded!','success');
+}
+</script>
+</body>
+</html>
